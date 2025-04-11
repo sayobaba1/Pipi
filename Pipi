@@ -1,96 +1,76 @@
+-- Orion Library'yi Yükle
 local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 
--- AYARLANABİLİR KEY
-local validKeys = {
-    "hitler-sama",
-    "sayohub123"
-}
-
-local userHasKey = false
-
--- KEY İSTEME ARAYÜZÜ
-OrionLib:MakeNotification({
-	Name = "SayoHub Key System",
-	Content = "Devam etmek için doğru anahtarı gir",
-	Image = "rbxassetid://4483345998",
-	Time = 5
+-- Ana Pencereyi Oluştur
+local Window = OrionLib:MakeWindow({
+    Name = "SayoHub",
+    HidePremium = false,
+    IntroEnabled = true,
+    IntroText = "Welcome SayoHub",
+    SaveConfig = true,
+    ConfigFolder = "SayoHub",
+    ConfigFile = "SayoHubConfig",
 })
 
-OrionLib:Init()
+-- Key System
+local key = "hitler-sama" -- Buraya geçerli anahtarınızı yazın
 
--- KEY GİRİŞ PENCERESİ
-local KeyWindow = OrionLib:MakeWindow({Name = "SayoHub | Key System", HidePremium = false, SaveConfig = false})
+local keyValid = false
 
-local KeyTab = KeyWindow:MakeTab({
-	Name = "Key Girişi",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
+-- Anahtar kontrolü
+local function checkKey()
+    local inputKey = OrionLib:CreateTextBox({
+        Name = "Enter Key",
+        Default = "",
+        Placeholder = "Enter the key to use this script",
+        TextboxType = Enum.TextBoxType.Password,
+        ClearTextAfterFocusLost = false,
+        Callback = function(input)
+            if input == key then
+                keyValid = true
+                OrionLib:CreateNotification({
+                    Name = "Key Valid",
+                    Content = "Your key is valid! Welcome!",
+                    Time = 5
+                })
+            else
+                OrionLib:CreateNotification({
+                    Name = "Key Invalid",
+                    Content = "The key is invalid. Try again.",
+                    Time = 5
+                })
+            end
+        end
+    })
 
-KeyTab:AddTextbox({
-	Name = "Anahtarı Girin",
-	Default = "",
-	TextDisappear = false,
-	Callback = function(input)
-		for _, key in pairs(validKeys) do
-			if input == key then
-				userHasKey = true
-				OrionLib:MakeNotification({
-					Name = "Başarılı",
-					Content = "Doğru anahtar girildi!",
-					Image = "rbxassetid://4483345998",
-					Time = 4
-				})
-				wait(1)
-				loadMainUI() -- Ana GUI'yi başlat
-				break
-			end
-		end
-
-		if not userHasKey then
-			OrionLib:MakeNotification({
-				Name = "Hatalı",
-				Content = "Geçersiz anahtar!",
-				Image = "rbxassetid://4483345998",
-				Time = 4
-			})
-		end
-	end
-})
-
--- ASIL GUI BURADA TANIMLANIYOR
-function loadMainUI()
-	local MainWindow = OrionLib:MakeWindow({Name = "SayoHub", HidePremium = false, SaveConfig = true, ConfigFolder = "SayoHub"})
-
-	local PlayerTab = MainWindow:MakeTab({
-		Name = "Player",
-		Icon = "rbxassetid://4483362458",
-		PremiumOnly = false
-	})
-
-	PlayerTab:AddButton({
-		Name = "WalkSpeed 100",
-		Callback = function()
-			game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
-		end
-	})
-
-	PlayerTab:AddSlider({
-		Name = "Dash Length",
-		Min = 10,
-		Max = 1000,
-		Default = 10,
-		Increment = 1,
-		ValueName = "Length",
-		Callback = function(Value)
-			game.Players.LocalPlayer.Character:SetAttribute("DashLength", Value)
-		end
-	})
-
-	PlayerTab:AddButton({
-		Name = "JumpPower 100",
-		Callback = function()
-			game.Players.LocalPlayer.Character.Humanoid.JumpHeight = 100
-		end
-	})
+    inputKey:Show()
 end
+
+-- Eğer geçerli bir anahtar varsa, arayüzü açmaya izin ver
+if not keyValid then
+    checkKey()
+end
+
+-- "Player" sekmesini oluştur
+local PlayerTab = Window:NewTab("Player")
+
+-- "Player" sekmesine bir bölüm ekle
+local Section = PlayerTab:NewSection("Player Controls")
+
+-- "Set Walk Speed" butonunu oluştur
+Section:NewButton("Set Walk Speed 100", "Set your walkspeed to 100", function()
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+end)
+
+-- Dash length için bir slider ekle
+Section:NewSlider("Dash Length", "Set the dash length", 1000, 10, function(Value)
+    game.Players.LocalPlayer.Character:SetAttribute("DashLength", Value)
+end)
+
+-- "Set Jump Power" butonunu oluştur
+Section:NewButton("Set Jump Power 100", "Set your jump power to 100", function()
+    game.Players.LocalPlayer.Character.Humanoid.JumpHeight = 100
+end)
+
+-- UI'yi başlat
+OrionLib:Init()
