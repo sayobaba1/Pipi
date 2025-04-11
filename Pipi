@@ -1,78 +1,63 @@
--- Rayfield Kütüphanesini Yükle
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
--- Key doğrulama
-local key = "hitler-sama"
-local keyValid = false
+local Window = Rayfield:CreateWindow({
+   Name = "SayoHub",
+   Icon = 0,
+   LoadingTitle = "SayoHub Yükleniyor...",
+   LoadingSubtitle = "by SayoBaba",
+   Theme = "Default",
 
--- Anahtar doğrulama fonksiyonu
-local function checkKey()
-    -- Anahtar doğrulama penceresi oluştur
-    local KeyWindow = Rayfield:CreateWindow({
-        Name = "SayoHub Key Verification",
-        Icon = 0,
-        LoadingTitle = "Key Verification",
-        LoadingSubtitle = "Please enter your key.",
-        Theme = "Default"
-    })
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
 
-    -- Anahtar girme kısmı
-    local KeyTab = KeyWindow:CreateTab("Key")
-    KeyTab:CreateTextbox({
-        Name = "Enter Key",
-        PlaceholderText = "Enter key here...",
-        TextChanged = function(input)
-            if input == key then
-                keyValid = true
-                Rayfield:CreateNotification("Key Verified", "The key is valid! Welcome to SayoHub.", 5)
-                KeyWindow:Destroy()  -- Key penceresini kapat
-                createPlayerTab()  -- Player sekmesini oluştur
-            else
-                Rayfield:CreateNotification("Invalid Key", "The key you entered is incorrect.", 5)
-            end
-        end
-    })
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "SayoHubData",
+      FileName = "SayoHubConfig"
+   },
 
-    KeyWindow:Init()  -- Anahtar doğrulama penceresini başlat
-end
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
 
--- Player sekmesini oluştur
-local function createPlayerTab()
-    -- Ana pencerede Player sekmesini oluştur
-    local Window = Rayfield:CreateWindow({
-        Name = "SayoHub",
-        Icon = 0,
-        LoadingTitle = "Welcome SayoHub",
-        LoadingSubtitle = "by SayoBaba",
-        Theme = "Default"
-    })
+   KeySystem = true,
+   KeySettings = {
+      Title = "SayoHub Key",
+      Subtitle = "Key Sistemine Hoş Geldin",
+      Note = "Şifre: hitler-sama",
+      FileName = "SayoKey",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = {"hitler-sama"}
+   }
+})
 
-    local PlayerTab = Window:CreateTab("Player")  -- Player sekmesi
+local PlayerTab = Window:CreateTab("Player", 4483362458)
 
-    -- Yürüme hızı için slider ekle
-    PlayerTab:CreateSlider({
-        Name = "Walk Speed",
-        Range = {16, 500},  -- Minimum 16, Maksimum 500 (veya istediğiniz hız aralığını ayarlayın)
-        Increment = 1,
-        Suffix = "Speed",
-        CurrentValue = 16,  -- Başlangıç değeri
-        Flag = "WalkSpeed",  -- Kaydetme için flag
-        Callback = function(value)
-            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value  -- Yürüme hızını ayarla
-        end
-    })
+-- Yürüme Hızı Sliderı
+local WalkSpeedSlider = PlayerTab:CreateSlider({
+   Name = "Yürüme Hızı",
+   Range = {10, 200},
+   Increment = 1,
+   Suffix = "hız",
+   CurrentValue = 16,
+   Flag = "WalkSpeedSlider",
+   Callback = function(Value)
+      game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+   end,
+})
 
-    -- Zıplama yüksekliği butonu ekle
-    PlayerTab:CreateButton({
-        Name = "Set Jump Power to 100",
-        Callback = function()
-            game.Players.LocalPlayer.Character.Humanoid.JumpHeight = 100  -- Zıplama yüksekliğini ayarla
-        end
-    })
-
-    -- UI'yi başlat
-    Window:Init()
-end
-
--- Key doğrulama işlemini başlat
-checkKey()
+-- Zıplama Yüksekliği Sliderı
+local JumpPowerSlider = PlayerTab:CreateSlider({
+   Name = "Zıplama Gücü",
+   Range = {20, 150},
+   Increment = 1,
+   Suffix = "güç",
+   CurrentValue = 50,
+   Flag = "JumpPowerSlider",
+   Callback = function(Value)
+      game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
+   end,
+})
