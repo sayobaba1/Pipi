@@ -1,63 +1,96 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 
-local Window = Rayfield:CreateWindow({
-   Name = "SayoHub",
-   Icon = 0,
-   LoadingTitle = "Welcome SayoHub",
-   LoadingSubtitle = "by SayoBaba",
-   Theme = "Default",
+-- AYARLANABİLİR KEY
+local validKeys = {
+    "hitler-sama",
+    "sayohub123"
+}
 
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false,
+local userHasKey = false
 
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = nil,
-      FileName = "SayoHub"
-   },
-
-   Discord = {
-      Enabled = false,
-      Invite = "noinvitelink",
-      RememberJoins = true
-   },
-
-   KeySystem = true,
-   KeySettings = {
-      Title = "Please Key",
-      Subtitle = "Key System",
-      Note = "No method of obtaining the key is provided",
-      FileName = "Key",
-      SaveKey = false,
-      GrabKeyFromSite = false,
-      Key = {"hitler-sama"}
-   }
+-- KEY İSTEME ARAYÜZÜ
+OrionLib:MakeNotification({
+	Name = "SayoHub Key System",
+	Content = "Devam etmek için doğru anahtarı gir",
+	Image = "rbxassetid://4483345998",
+	Time = 5
 })
 
-local PlayerTab = Window:CreateTab("Player", 4483362458)
+OrionLib:Init()
 
-local Button = PlayerTab:CreateButton({
-   Name = "Set Walk Speed 100",
-   Callback = function()
-      game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
-   end,
+-- KEY GİRİŞ PENCERESİ
+local KeyWindow = OrionLib:MakeWindow({Name = "SayoHub | Key System", HidePremium = false, SaveConfig = false})
+
+local KeyTab = KeyWindow:MakeTab({
+	Name = "Key Girişi",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
 })
 
-local Slider = PlayerTab:CreateSlider({
-   Name = "Dash length",
-   Range = {10, 1000},
-   Increment = 1,
-   Suffix = "Length",
-   CurrentValue = 10,
-   Flag = "Slider2",
-   Callback = function(Value)
-      game.Players.LocalPlayer.Character:SetAttribute("DashLength", Value)
-   end,
+KeyTab:AddTextbox({
+	Name = "Anahtarı Girin",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(input)
+		for _, key in pairs(validKeys) do
+			if input == key then
+				userHasKey = true
+				OrionLib:MakeNotification({
+					Name = "Başarılı",
+					Content = "Doğru anahtar girildi!",
+					Image = "rbxassetid://4483345998",
+					Time = 4
+				})
+				wait(1)
+				loadMainUI() -- Ana GUI'yi başlat
+				break
+			end
+		end
+
+		if not userHasKey then
+			OrionLib:MakeNotification({
+				Name = "Hatalı",
+				Content = "Geçersiz anahtar!",
+				Image = "rbxassetid://4483345998",
+				Time = 4
+			})
+		end
+	end
 })
 
-local Button2 = PlayerTab:CreateButton({
-   Name = "Set Jump Power 100",
-   Callback = function()
-      game.Players.LocalPlayer.Character.Humanoid.JumpHeight = 100
-   end,
-})
+-- ASIL GUI BURADA TANIMLANIYOR
+function loadMainUI()
+	local MainWindow = OrionLib:MakeWindow({Name = "SayoHub", HidePremium = false, SaveConfig = true, ConfigFolder = "SayoHub"})
+
+	local PlayerTab = MainWindow:MakeTab({
+		Name = "Player",
+		Icon = "rbxassetid://4483362458",
+		PremiumOnly = false
+	})
+
+	PlayerTab:AddButton({
+		Name = "WalkSpeed 100",
+		Callback = function()
+			game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+		end
+	})
+
+	PlayerTab:AddSlider({
+		Name = "Dash Length",
+		Min = 10,
+		Max = 1000,
+		Default = 10,
+		Increment = 1,
+		ValueName = "Length",
+		Callback = function(Value)
+			game.Players.LocalPlayer.Character:SetAttribute("DashLength", Value)
+		end
+	})
+
+	PlayerTab:AddButton({
+		Name = "JumpPower 100",
+		Callback = function()
+			game.Players.LocalPlayer.Character.Humanoid.JumpHeight = 100
+		end
+	})
+end
