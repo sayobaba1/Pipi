@@ -1,84 +1,78 @@
--- Orion Library'yi Yükle
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
-
--- Geçerli bir Key
-local key = "hitler-sama" -- Buraya geçerli anahtarınızı yazın
+-- Rayfield Kütüphanesini Yükle
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 -- Key doğrulama
+local key = "hitler-sama"
 local keyValid = false
 
--- Anahtar kontrol fonksiyonu
+-- Anahtar doğrulama fonksiyonu
 local function checkKey()
-    -- Anahtar doğrulama UI'yi göster
-    local inputKey = OrionLib:MakeWindow({
-        Name = "Key Verification",
-        HidePremium = true,
-        IntroEnabled = false
+    -- Anahtar doğrulama penceresi oluştur
+    local KeyWindow = Rayfield:CreateWindow({
+        Name = "SayoHub Key Verification",
+        Icon = 0,
+        LoadingTitle = "Key Verification",
+        LoadingSubtitle = "Please enter your key.",
+        Theme = "Default"
     })
 
-    -- TextBox ile anahtar girilmesini sağla
-    local Section = inputKey:NewSection("Enter Key")
-
-    Section:NewTextBox("Enter Key", "Enter your key to use this script", function(input)
-        if input == key then
-            keyValid = true
-            -- Doğru anahtar girildiyse UI'yi aç
-            OrionLib:CreateNotification({
-                Name = "Key Valid",
-                Content = "Your key is valid! Welcome!",
-                Time = 5
-            })
-            inputKey:Destroy() -- Anahtar doğrulama penceresini kapat
-            createMainUI()  -- Ana UI'yi oluştur
-        else
-            -- Yanlış anahtar girildiğinde bildirim göster
-            OrionLib:CreateNotification({
-                Name = "Key Invalid",
-                Content = "The key is invalid. Try again.",
-                Time = 5
-            })
+    -- Anahtar girme kısmı
+    local KeyTab = KeyWindow:CreateTab("Key")
+    KeyTab:CreateTextbox({
+        Name = "Enter Key",
+        PlaceholderText = "Enter key here...",
+        TextChanged = function(input)
+            if input == key then
+                keyValid = true
+                Rayfield:CreateNotification("Key Verified", "The key is valid! Welcome to SayoHub.", 5)
+                KeyWindow:Destroy()  -- Key penceresini kapat
+                createPlayerTab()  -- Player sekmesini oluştur
+            else
+                Rayfield:CreateNotification("Invalid Key", "The key you entered is incorrect.", 5)
+            end
         end
-    end)
+    })
+
+    KeyWindow:Init()  -- Anahtar doğrulama penceresini başlat
 end
 
--- Ana UI'yi oluştur
-local function createMainUI()
-    local Window = OrionLib:MakeWindow({
+-- Player sekmesini oluştur
+local function createPlayerTab()
+    -- Ana pencerede Player sekmesini oluştur
+    local Window = Rayfield:CreateWindow({
         Name = "SayoHub",
-        HidePremium = false,
-        IntroEnabled = true,
-        IntroText = "Welcome SayoHub",
-        SaveConfig = true,
-        ConfigFolder = "SayoHub",
-        ConfigFile = "SayoHubConfig",
+        Icon = 0,
+        LoadingTitle = "Welcome SayoHub",
+        LoadingSubtitle = "by SayoBaba",
+        Theme = "Default"
     })
 
-    -- "Player" sekmesini oluştur
-    local PlayerTab = Window:NewTab("Player")
+    local PlayerTab = Window:CreateTab("Player")  -- Player sekmesi
 
-    -- "Player" sekmesine bir bölüm ekle
-    local Section = PlayerTab:NewSection("Player Controls")
+    -- Yürüme hızı için slider ekle
+    PlayerTab:CreateSlider({
+        Name = "Walk Speed",
+        Range = {16, 500},  -- Minimum 16, Maksimum 500 (veya istediğiniz hız aralığını ayarlayın)
+        Increment = 1,
+        Suffix = "Speed",
+        CurrentValue = 16,  -- Başlangıç değeri
+        Flag = "WalkSpeed",  -- Kaydetme için flag
+        Callback = function(value)
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value  -- Yürüme hızını ayarla
+        end
+    })
 
-    -- "Set Walk Speed" butonunu oluştur
-    Section:NewButton("Set Walk Speed 100", "Set your walkspeed to 100", function()
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
-    end)
-
-    -- Dash length için bir slider ekle
-    Section:NewSlider("Dash Length", "Set the dash length", 1000, 10, function(Value)
-        game.Players.LocalPlayer.Character:SetAttribute("DashLength", Value)
-    end)
-
-    -- "Set Jump Power" butonunu oluştur
-    Section:NewButton("Set Jump Power 100", "Set your jump power to 100", function()
-        game.Players.LocalPlayer.Character.Humanoid.JumpHeight = 100
-    end)
+    -- Zıplama yüksekliği butonu ekle
+    PlayerTab:CreateButton({
+        Name = "Set Jump Power to 100",
+        Callback = function()
+            game.Players.LocalPlayer.Character.Humanoid.JumpHeight = 100  -- Zıplama yüksekliğini ayarla
+        end
+    })
 
     -- UI'yi başlat
-    OrionLib:Init()
+    Window:Init()
 end
 
--- Eğer key geçerli değilse, doğrulama fonksiyonunu başlat
-if not keyValid then
-    checkKey()
-end
+-- Key doğrulama işlemini başlat
+checkKey()
